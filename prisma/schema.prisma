@@ -15,15 +15,27 @@ datasource db {
 }
 
 model Post {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
   title       String
-  likes       String[] @default([])
+  likes       String[]  @default([])
   tags        String[]
   description String
   topic       String
   content     String
   image       String
-  createdBy   String   @db.ObjectId
-  createdAt   DateTime @default(now()) @map(name: "created_at")
-  updatedAt   DateTime @updatedAt @map(name: "updated_at")
+  createdBy   String
+  createdAt   DateTime  @default(now()) @map(name: "created_at")
+  updatedAt   DateTime  @updatedAt @map(name: "updated_at")
+  comments    Comment[] @relation("PostComments")
+}
+
+model Comment {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  content   String
+  likes     String[] @default([])
+  createdBy String
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
+  post      Post     @relation("PostComments", fields: [postId], references: [id])
+  postId    String   @db.ObjectId
 }

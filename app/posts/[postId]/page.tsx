@@ -140,16 +140,12 @@ const SinglePost = ({ params }: { params: { postId: string } }) => {
 
 				{/* Comments Button */}
 				<div className="flex flex-col gap-1 items-center">
-					<a href="#comments">
-						<MessageCircle />
-					</a>
+					<a href="#comments"><MessageCircle /></a>
 					<span>{post?.comments?.length}</span>
 				</div>
 
 				{/* Bookmark Button */}
-				<button>
-					<Bookmark />
-				</button>
+				<button><Bookmark /></button>
 			</div>
 
 			{/* Main Content */}
@@ -170,9 +166,7 @@ const SinglePost = ({ params }: { params: { postId: string } }) => {
 							</AvatarFallback>
 						</Avatar>
 						<div className="flex flex-col">
-							<h1 className="font-extrabold">
-								{user?.firstName} {user?.lastName}
-							</h1>
+							<h1 className="font-extrabold">{user?.firstName} {user?.lastName}</h1>
 							<span className="text-sm text-slate-400">Posted on {formatDate(post?.createdAt)}</span>
 						</div>
 					</div>

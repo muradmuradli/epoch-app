@@ -1,9 +1,9 @@
-import Navbar from "@/components/navbar";
+import Posts from "@/components/posts";
 
 export default function Home() {
 	return (
-		<div>
-			<Navbar />
+		<div className="p-10">
+			<Posts />
 		</div>
 	);
 }

@@ -8,6 +8,7 @@ import axios from "axios";
 import { Bookmark, Dot, Heart, MessageCircle } from "lucide-react";
 import { FC, useEffect, useState } from "react";
 import { MoonLoader } from "react-spinners";
+import {FaHeart, FaRegHeart} from 'react-icons/fa';
 
 interface CommentSectionProps {
 	post: any;
@@ -100,7 +101,7 @@ const SinglePost = ({ params }: { params: { postId: string } }) => {
 
 			try {
 				// Make API request
-				await axios.post(`/api/posts/like/${params.postId}`, {
+				await axios.post(`/api/posts/${params.postId}`, {
 					userId,
 				});
 			} catch (error) {
@@ -133,7 +134,7 @@ const SinglePost = ({ params }: { params: { postId: string } }) => {
 				{/* Like Button */}
 				<div className="flex flex-col gap-1 items-center">
 					<button onClick={likePost}>
-						<Heart color={post?.likes.includes(userId!) ? "red" : "black"} />
+						{post?.likes.includes(userId) ? <FaHeart size={24} className="text-red-500" />: <FaRegHeart size={24} />}
 					</button>
 					<span>{post?.likes?.length}</span>
 				</div>

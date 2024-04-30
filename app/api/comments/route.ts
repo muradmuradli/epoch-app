@@ -18,14 +18,14 @@ export async function POST(req: Request) {
 
     const comment = await prismadb.comment.create({
       data: {
-       content, postId, createdBy: userId
+        content, postId, createdBy: userId
       }
     })
 
     return NextResponse.json(comment);
 
   } catch (error) {
-    console.log('[STORES_POST]', error);
+    console.log('[COMMENTS_POST]', error);
     return new NextResponse("Internal error", { status: 500 })
   }
 }

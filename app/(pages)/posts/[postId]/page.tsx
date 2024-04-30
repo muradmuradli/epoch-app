@@ -1,14 +1,16 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
 import { useAuth } from "@clerk/nextjs";
 import { User } from "@clerk/nextjs/server";
 import axios from "axios";
 import { Bookmark, Dot, Heart, MessageCircle } from "lucide-react";
-import { FC, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { FaComment, FaHeart, FaRegHeart } from "react-icons/fa";
 import { MoonLoader } from "react-spinners";
-import {FaHeart, FaRegHeart} from 'react-icons/fa';
 
 interface CommentSectionProps {
 	post: any;
@@ -16,9 +18,29 @@ interface CommentSectionProps {
 }
 
 const CommentSection: React.FC<CommentSectionProps> = ({ post, user }) => {
+	const [content, setContent] = useState<string>("");
+	const [loading, setLoading] = useState<boolean>(false);
+	const [comments, setComments] = useState(post?.comments || []);
+
+	const createComment = async () => {
+		try {
+			setLoading(true);
+			const { data } = await axios.post("/api/comments", { content, postId: post.id });
+			const newComment = {...data, user}
+      setComments([newComment, ...comments]);
+			toast.success("Comment posted successfully!");
+			console.log("hey there");
+		} catch (error) {
+			console.log(error);
+			toast.error("Something went wrong.");
+		} finally {
+			setLoading(false);
+		}
+	};
+
 	return (
 		<div className="flex flex-col gap-7">
-			<h1 className="text-2xl">Comments ({post?.comments?.length})</h1>
+			<h1 className="text-2xl">Comments ({comments?.length})</h1>
 			{/* Comment Input */}
 			<div className="flex gap-2">
 				<Avatar className="cursor-pointer">
@@ -27,20 +49,30 @@ const CommentSection: React.FC<CommentSectionProps> = ({ post, user }) => {
 						{user?.firstName} {user?.lastName}
 					</AvatarFallback>
 				</Avatar>
-				<textarea className="w-full p-2 border border-slate-300 rounded-md" rows={3} placeholder="Add to the discussion"></textarea>
+				<div className="flex flex-col gap-2 w-full items-end">
+					<textarea value={content} onChange={(e) => setContent(e.target.value)} className="w-full p-2 border border-slate-300 rounded-md" rows={3} placeholder="Add to the discussion"></textarea>
+					<Button className="flex gap-2" type="submit" variant="default" disabled={loading} onClick={createComment}>
+						<span>Submit</span>
+						<FaComment />
+					</Button>
+				</div>
 			</div>
 			{/* Display Comments */}
 			<div id="comments" className="mt-8 flex flex-col gap-5">
-				{post?.comments?.map((comment: any) => (
+				{comments?.map((comment: any) => (
 					<div key={comment.id} className="flex gap-2">
 						<Avatar className="cursor-pointer">
 							<AvatarImage src={comment?.user?.imageUrl} />
-							<AvatarFallback className="uppercase">{user?.firstName} {user?.lastName}</AvatarFallback>
+							<AvatarFallback className="uppercase">
+								{user?.firstName} {user?.lastName}
+							</AvatarFallback>
 						</Avatar>
 						<div className="flex flex-col gap-2 w-full">
 							<div className="p-3 border border-slate-200 rounded-md">
 								<div className="flex items-center gap-1">
-									<h1 className="font-semibold">{comment?.user?.firstName} {comment?.user?.lastName}</h1>
+									<h1 className="font-semibold">
+										{comment?.user?.firstName} {comment?.user?.lastName}
+									</h1>
 									<Dot />
 									<span className="text-sm text-slate-500">{formatDate(comment?.createdAt)}</span>
 								</div>
@@ -48,11 +80,15 @@ const CommentSection: React.FC<CommentSectionProps> = ({ post, user }) => {
 							</div>
 							<div className="flex gap-7">
 								<div className="flex items-center gap-2">
-									<button><Heart /></button>
+									<button>
+										<Heart />
+									</button>
 									<span>{comment?.likes?.length}</span>
 								</div>
 								<div className="flex items-center gap-2">
-									<button><MessageCircle /></button>
+									<button>
+										<MessageCircle />
+									</button>
 									<span>23</span>
 								</div>
 							</div>
@@ -133,20 +169,22 @@ const SinglePost = ({ params }: { params: { postId: string } }) => {
 			<div className="w-2/12 flex flex-col gap-4 items-end mt-10">
 				{/* Like Button */}
 				<div className="flex flex-col gap-1 items-center">
-					<button onClick={likePost}>
-						{post?.likes.includes(userId) ? <FaHeart size={24} className="text-red-500" />: <FaRegHeart size={24} />}
-					</button>
+					<button onClick={likePost}>{post?.likes.includes(userId) ? <FaHeart size={24} className="text-red-500" /> : <FaRegHeart size={24} />}</button>
 					<span>{post?.likes?.length}</span>
 				</div>
 
 				{/* Comments Button */}
 				<div className="flex flex-col gap-1 items-center">
-					<a href="#comments"><MessageCircle /></a>
+					<a href="#comments">
+						<MessageCircle />
+					</a>
 					<span>{post?.comments?.length}</span>
 				</div>
 
 				{/* Bookmark Button */}
-				<button><Bookmark /></button>
+				<button>
+					<Bookmark />
+				</button>
 			</div>
 
 			{/* Main Content */}
@@ -167,7 +205,9 @@ const SinglePost = ({ params }: { params: { postId: string } }) => {
 							</AvatarFallback>
 						</Avatar>
 						<div className="flex flex-col">
-							<h1 className="font-extrabold">{user?.firstName} {user?.lastName}</h1>
+							<h1 className="font-extrabold">
+								{user?.firstName} {user?.lastName}
+							</h1>
 							<span className="text-sm text-slate-400">Posted on {formatDate(post?.createdAt)}</span>
 						</div>
 					</div>

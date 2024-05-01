@@ -39,3 +39,10 @@ model Comment {
   post      Post     @relation("PostComments", fields: [postId], references: [id])
   postId    String   @db.ObjectId
 }
+
+model SavedPost {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  postId    String  @db.ObjectId
+  userId    String
+  createdAt DateTime @default(now()) @map(name: "created_at")
+}

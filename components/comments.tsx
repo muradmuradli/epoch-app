@@ -27,7 +27,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ post, user }) => {
 			const { data } = await axios.post("/api/comments", { content, postId: post.id });
 			const newComment = { ...data, user };
 			setComments([newComment, ...comments]);
-      setContent('');
+			setContent("");
 			toast.success("Comment posted successfully!");
 		} catch (error) {
 			console.log(error);
@@ -37,19 +37,41 @@ const CommentSection: React.FC<CommentSectionProps> = ({ post, user }) => {
 		}
 	};
 
-  const onDelete = async (commentId: string) => {
-    console.log(commentId);
-    try {
-      setLoading(true);
-      await axios.delete(`/api/comments/${commentId}`);
-      setComments(comments.filter((comment: any) => comment.id !== commentId));
-      toast.success("Comment deleted!");
-    } catch (error) {
-      toast.error("Failed to delete comment.");
-    } finally {
-      setLoading(false);
-    }
-  };
+	const onDelete = async (commentId: string) => {
+		try {
+			setLoading(true);
+			await axios.delete(`/api/comments/${commentId}`);
+			setComments(comments.filter((comment: any) => comment.id !== commentId));
+			toast.success("Comment deleted!");
+		} catch (error) {
+			toast.error("Failed to delete comment.");
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const likeComment = async (commentId: string) => {
+		try {
+			let updatedComments = comments.map((comment: any) => {
+				if (comment.id === commentId) {
+					const alreadyLiked = comment.likes.includes(user.id);
+					if (alreadyLiked) {
+						const updatedLikes = comment.likes.filter((userId: string) => userId !== user.id);
+						return { ...comment, likes: updatedLikes };
+					} else {
+						return { ...comment, likes: [...comment.likes, user.id] };
+					}
+				}
+				return comment;
+			});
+
+			setComments(updatedComments);
+			await axios.post(`/api/comments/${commentId}/like`);
+		} catch (error) {
+			toast.error("Failed to like/unlike the comment.");
+			setComments(comments);
+		}
+	};
 
 	return (
 		<div className="flex flex-col gap-7">
@@ -96,7 +118,13 @@ const CommentSection: React.FC<CommentSectionProps> = ({ post, user }) => {
 							</div>
 							<div className="flex gap-5 justify-start">
 								<div className="flex gap-2 items-center">
-									<Button type="button" variant="outline" size="icon">
+									<Button
+										className={`${comment?.likes.includes(user.id) ? "bg-red-500 hover:bg-red-600 text-white hover:text-white" : ""}`}
+										onClick={() => likeComment(comment?.id)}
+										type="button"
+										variant="outline"
+										size="icon"
+									>
 										<Heart size={15} />
 									</Button>
 									<span>{comment?.likes?.length}</span>
@@ -107,10 +135,10 @@ const CommentSection: React.FC<CommentSectionProps> = ({ post, user }) => {
 											<Trash2 size={15} />
 										</Button>
 									}
-                  title="Sure you want to delete this comment?"
-                  description="This cannot be undone!"
-                  onConfirm={() => onDelete(comment?.id)}
-                  loading={loading}
+									title="Sure you want to delete this comment?"
+									description="This cannot be undone!"
+									onConfirm={() => onDelete(comment?.id)}
+									loading={loading}
 								/>
 							</div>
 						</div>

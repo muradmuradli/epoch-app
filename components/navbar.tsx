@@ -3,7 +3,7 @@
 import { Input } from "@/components/ui/input";
 import { UserButton, useAuth } from "@clerk/nextjs";
 import axios from "axios";
-import { LogIn, Search } from "lucide-react";
+import { LogIn, Pencil, PencilIcon, Search } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
@@ -48,31 +48,23 @@ const Navbar = () => {
 
 			{/* Search field */}
 			<div className="flex w-[35rem] items-center gap-2 relative">
-				<Input
-					value={inputText}
-					onChange={(e) => setInputText(e.target.value)}
-					className="w-full border-slate-300"
-					type="email"
-					placeholder="What are you interested in?"
-				/>
-				<Button
-					type="submit"
-					className="flex gap-2 bg-blue-600 hover:bg-blue-700"
-				>
+				<Input value={inputText} onChange={(e) => setInputText(e.target.value)} className="w-full border-slate-300" type="email" placeholder="What are you interested in?" />
+				<Button type="submit" className="flex gap-2 bg-blue-600 hover:bg-blue-700">
 					<Search size="20" />
 					<span>Search</span>
 				</Button>
 
 				{/* Post suggestion menu that pops up when you type into the search-bar */}
-				<SuggestionMenu
-					posts={searchResults}
-					isOpen={isOpen}
-					setIsOpen={setIsOpen}
-				/>
+				<SuggestionMenu posts={searchResults} isOpen={isOpen} setIsOpen={setIsOpen} />
 			</div>
 
 			{/* Sign In Button / User Button */}
-			<div>
+			<div className="flex items-center gap-10">
+				<Link className="flex gap-2 text-slate-600 items-center hover:text-slate-900 transition py-0 px-2" href={"/write"}>
+					<PencilIcon size={16} />
+					<span >Write</span>
+				</Link>
+
 				{userId ? (
 					<UserButton afterSignOutUrl="/" />
 				) : (

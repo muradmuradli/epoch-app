@@ -10,6 +10,7 @@ import toast from "react-hot-toast";
 import { FaComment } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
 import { ConfirmationModal } from "./confirmation-modal";
+import { useRouter } from "next/navigation";
 
 interface CommentSectionProps {
 	post: any;

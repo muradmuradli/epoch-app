@@ -99,7 +99,7 @@ const SinglePost = ({ params }: { params: { postId: string } }) => {
 			{/* side panel */}
 			<div className="w-2/12 flex flex-col gap-4 items-end mt-10">
 				{/* like button */}
-				<div className="flex flex-col gap-1 items-center">
+				<div className="flex flex-col items-center">
 					<Button variant="ghost" className="px-2" onClick={likePost}>
 						{post?.likes.includes(userId) ? <FaHeart size={24} className="text-red-500" /> : <FaRegHeart size={24} />}
 					</Button>

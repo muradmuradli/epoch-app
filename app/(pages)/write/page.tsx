@@ -10,8 +10,8 @@ import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 import { Send, TrainFrontTunnel } from "lucide-react";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import "react-quill/dist/quill.snow.css";
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
@@ -48,8 +48,12 @@ const Tooltip = ({ show, position, title, content }: TooltipProps) => {
 const Write = () => {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 
-	const { userId } = useAuth();
 	const router = useRouter();
+
+	const searchParams = useSearchParams();
+	const postId = searchParams.get("postId");
+
+	const { userId } = useAuth();
 
 	const [title, setTitle] = useState<string>("");
 	const [topic, setTopic] = useState<string>("");
@@ -64,58 +68,91 @@ const Write = () => {
 	const [showDescTooltip, setShowDescTooltip] = useState(false);
 	const [showTagsTooltip, setShowTagsTooltip] = useState(false);
 
+	useEffect(() => {
+		const fetchPostDetails = async () => {
+			try {
+				const response = await axios.get(`/api/posts/${postId}`);
+				setTitle(response.data.post.title);
+				setTopic(response.data.post.topic);
+				setContent(response.data.post.content);
+				setDescription(response.data.post.description);
+				setImage(response.data.post.image);
+				setTags(response.data.post.tags);
+			} catch (error) {
+				console.error("Failed to fetch post details:", error);
+			}
+		};
+
+		if (postId) {
+			fetchPostDetails();
+		}
+	}, [postId]);
+
 	const onSubmit = async (e: any) => {
 		e.preventDefault();
 		if (!image) {
 			toast.error("Please add a background image");
 			return;
 		}
-
+	
 		if (!title) {
 			toast.error("Please add a title");
 			return;
 		}
-
+	
 		if (!description) {
 			toast.error("Please add a short description");
 			return;
 		}
-
+	
 		if (!topic) {
 			toast.error("Please choose a topic");
 			return;
 		}
-
+	
 		if (tags.length === 0) {
 			toast.error("Please add at least 1 tag");
 			return;
 		}
-
+	
 		if (!content) {
 			toast.error("Please add a body to your post");
 			return;
 		}
-
+	
 		try {
 			setIsLoading(true);
-			await axios.post("/api/posts", {
-				id: userId,
-				title,
-				topic,
-				content,
-				description,
-				tags,
-				image,
-			});
-
-			toast.success("Post created successfully! Redirecting!...", {
+			if (postId) {
+				// If postId exists, it means we are editing an existing post
+				await axios.patch(`/api/posts/${postId}`, {
+					title,
+					topic,
+					content,
+					description,
+					tags,
+					image,
+				});
+			} else {
+				// If postId doesn't exist, it means we are creating a new post
+				await axios.post("/api/posts", {
+					id: userId,
+					title,
+					topic,
+					content,
+					description,
+					tags,
+					image,
+				});
+			}
+	
+			toast.success("Post saved successfully!", {
 				duration: 2000,
 				style: {
 					backgroundColor: "#1790ec",
 					color: "white",
 				},
 			});
-
+	
 			setTimeout(() => {
 				router.push("/");
 			}, 1000);
@@ -154,7 +191,7 @@ const Write = () => {
 									endpoint="imageUploader"
 									onClientUploadComplete={(res: any) => {
 										console.log(res[0]);
-										console.log('here i am');
+										console.log("here i am");
 										// Do something with the response
 										setImage(res[0].url);
 									}}

@@ -169,7 +169,7 @@ const SinglePost = ({ params }: { params: { postId: string } }) => {
 						</div>
 						{userId === post?.createdBy && (
 							<div className="flex items-center">
-								<IconButton color="secondary">
+								<IconButton color="secondary" onClick={() => router.push(`/write?postId=${post?.id}`)}>
 									<Edit />
 								</IconButton>
 								<ConfirmationModal

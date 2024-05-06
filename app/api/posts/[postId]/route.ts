@@ -90,3 +90,38 @@ export async function DELETE(req: Request, { params }: { params: { postId: strin
     return new NextResponse("Internal error", { status: 500 })
   }
 }
+
+export async function PATCH(req: Request, { params }: { params: { postId: string } }) {
+  try {
+    const { userId } = auth();
+
+    if (!userId) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    const { title, topic, content, description, tags, image } = await req.json();
+
+    // Update the post with the provided data
+    const updatedPost = await prismadb.post.updateMany({
+      where: { id: params.postId },
+      data: {
+        title,
+        topic,
+        content,
+        description,
+        tags,
+        image,
+        updatedAt: new Date(),
+      },
+    });
+
+    if (!updatedPost) {
+      return new NextResponse("Post not found", { status: 404 });
+    }
+
+    return new NextResponse("Post updated successfully!", { status: 200 });
+  } catch (error) {
+    console.log('[POSTS_PATCH]', error);
+    return new NextResponse("Internal error", { status: 500 });
+  }
+}

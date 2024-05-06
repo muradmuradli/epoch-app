@@ -1,5 +1,6 @@
 import prismadb from "@/lib/prismadb";
-import { clerkClient } from "@clerk/nextjs";
+import { auth, clerkClient } from "@clerk/nextjs";
+import { NextResponse } from "next/server";
 
 export async function GET(request: Request, { params }: { params: { postId: string } }) {
   const postId = params.postId;
@@ -60,4 +61,32 @@ export async function POST(
   });
 
   return Response.json({ status: 201 });
+}
+
+export async function DELETE(req: Request, { params }: { params: { postId: string } }) {
+  try {
+    const { userId } = auth();
+
+    if (!userId) {
+      return new NextResponse("Unauthorized", { status: 401 })
+    }
+
+    // First, delete associated comments
+    await prismadb.comment.deleteMany({
+      where: {
+        postId: params.postId
+      }
+    });
+
+    await prismadb.post.deleteMany({
+      where: {
+        id: params.postId
+      }
+    })
+
+    return new NextResponse("Post deleted!", { status: 200 })
+  } catch (error) {
+    console.log('[POSTS_DELETE]', error);
+    return new NextResponse("Internal error", { status: 500 })
+  }
 }

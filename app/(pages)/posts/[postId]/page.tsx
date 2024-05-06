@@ -1,17 +1,20 @@
 "use client";
 
 import CommentSection from "@/components/comments";
+import { ConfirmationModal } from "@/components/confirmation-modal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
 import { useAuth } from "@clerk/nextjs";
 import { User } from "@clerk/nextjs/server";
+import { IconButton } from "@mui/material";
 import axios from "axios";
-import { BookMarked, Bookmark, MessageCircle } from "lucide-react";
+import { Edit, MessageCircle, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { FaBookmark, FaHeart, FaRegBookmark, FaRegHeart } from "react-icons/fa";
-import { MdBookmarkAdd, MdBookmarkAdded } from "react-icons/md";
+import { MdDeleteOutline } from "react-icons/md";
 import { MoonLoader } from "react-spinners";
 
 const SinglePost = ({ params }: { params: { postId: string } }) => {
@@ -19,7 +22,9 @@ const SinglePost = ({ params }: { params: { postId: string } }) => {
 	const [post, setPost] = useState<any>();
 	const [user, setUser] = useState<User>();
 	const [isLoading, setIsLoading] = useState<boolean>(false);
+	const [isDeleting, setIsDeleting] = useState<boolean>(false);
 	const [isSaved, setIsSaved] = useState<boolean>(false);
+	const router = useRouter();
 
 	useEffect(() => {
 		fetchPost();
@@ -82,6 +87,23 @@ const SinglePost = ({ params }: { params: { postId: string } }) => {
 		});
 	};
 
+	const onDelete = async (postId: string) => {
+		try {
+			setIsDeleting(true);
+			await axios.delete(`/api/posts/${postId}`);
+
+			router.refresh();
+			setTimeout(() => {
+				router.push("/");
+			}, 1000);
+			toast.success("Post deleted!");
+		} catch (error) {
+			toast.error("Failed to delete post.");
+		} finally {
+			setIsDeleting(false);
+		}
+	};
+
 	useEffect(() => {
 		fetchPost();
 	}, []);
@@ -130,19 +152,39 @@ const SinglePost = ({ params }: { params: { postId: string } }) => {
 				{/* post details */}
 				<div className="py-6 px-16 flex flex-col gap-8">
 					{/* author info */}
-					<div className="flex gap-3">
-						<Avatar className="cursor-pointer">
-							<AvatarImage src={user?.imageUrl} />
-							<AvatarFallback className="uppercase">
-								{user?.firstName} {user?.lastName}
-							</AvatarFallback>
-						</Avatar>
-						<div className="flex flex-col">
-							<h1 className="font-extrabold">
-								{user?.firstName} {user?.lastName}
-							</h1>
-							<span className="text-sm text-slate-400">Posted on {formatDate(post?.createdAt)}</span>
+					<div className="flex gap-3 justify-between">
+						<div className="flex gap-3">
+							<Avatar className="cursor-pointer">
+								<AvatarImage src={user?.imageUrl} />
+								<AvatarFallback className="uppercase">
+									{user?.firstName} {user?.lastName}
+								</AvatarFallback>
+							</Avatar>
+							<div className="flex flex-col">
+								<h1 className="font-extrabold">
+									{user?.firstName} {user?.lastName}
+								</h1>
+								<span className="text-sm text-slate-400">Posted on {formatDate(post?.createdAt)}</span>
+							</div>
 						</div>
+						{userId === post?.createdBy && (
+							<div className="flex items-center">
+								<IconButton color="secondary">
+									<Edit />
+								</IconButton>
+								<ConfirmationModal
+									triggerButton={
+										<IconButton color="error">
+											<MdDeleteOutline size={28} />
+										</IconButton>
+									}
+									title="Sure you want to delete this post?"
+									description="This cannot be undone!"
+									onConfirm={() => onDelete(post?.id)}
+									loading={isDeleting}
+								/>
+							</div>
+						)}
 					</div>
 
 					{/* post title and tags */}

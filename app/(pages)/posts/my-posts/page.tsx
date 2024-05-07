@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { MoonLoader } from "react-spinners";
 
-const SavedPosts = () => {
+const MyPosts = () => {
 	const [savedPosts, setSavedPosts] = useState<any[]>([]);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -20,7 +20,7 @@ const SavedPosts = () => {
 			setIsLoading(true);
 			const {
 				data: { data },
-			} = await axios.get("/api/posts/saved");
+			} = await axios.get("/api/posts/my-posts");
 			setSavedPosts(data);
 		} catch (error) {
 			toast.error("Something went wrong.");
@@ -39,7 +39,7 @@ const SavedPosts = () => {
 
 	return (
 		<>
-    <h1 className="text-slate-900">Your Saved Posts</h1>
+    <h1 className="text-slate-900">Your Created Posts</h1>
 			{savedPosts?.map((post) => {
 				return (
 					<Link key={post.id} className="flex gap-2 my-4" href={`/posts/${post.id}`}>
@@ -63,4 +63,4 @@ const SavedPosts = () => {
 	);
 };
 
-export default SavedPosts;
+export default MyPosts;

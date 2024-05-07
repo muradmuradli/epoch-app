@@ -3,13 +3,14 @@
 import { Input } from "@/components/ui/input";
 import { UserButton, useAuth } from "@clerk/nextjs";
 import axios from "axios";
-import { LogIn, PencilIcon, Search } from "lucide-react";
+import { Backpack, CircleUserIcon, LogIn, PencilIcon, Search } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { FaBookmark } from "react-icons/fa";
+import { FaBookmark, FaChessRook } from "react-icons/fa";
 import SuggestionMenu from "./suggestion-menu";
 import { Button } from "./ui/button";
 import SavedPosts from "@/app/(pages)/posts/saved/page";
+import MyPosts from "@/app/(pages)/posts/my-posts/page";
 
 const Navbar = () => {
 	const { isLoaded, userId, sessionId, getToken } = useAuth();
@@ -68,8 +69,11 @@ const Navbar = () => {
 
 				{userId ? (
 					<UserButton afterSignOutUrl="/">
-						<UserButton.UserProfilePage label="Saved" url="custom" labelIcon={<FaBookmark className="ml-[1px]" />}>
+						<UserButton.UserProfilePage label="Saved" url="saved" labelIcon={<FaBookmark className="ml-[1px]" />}>
 							<SavedPosts />
+						</UserButton.UserProfilePage>
+						<UserButton.UserProfilePage label="Own Posts" url="my-posts" labelIcon={<FaChessRook className="ml-[1px]" />}>
+							<MyPosts />
 						</UserButton.UserProfilePage>
 					</UserButton>
 				) : (

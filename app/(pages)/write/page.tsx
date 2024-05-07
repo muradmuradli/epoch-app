@@ -1,5 +1,6 @@
 "use client";
 
+import Editor from "@/components/editor";
 import InputTags from "@/components/tags";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -13,8 +14,6 @@ import dynamic from "next/dynamic";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
-import "react-quill/dist/quill.snow.css";
-const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 
 interface TooltipProps {
 	show: boolean;
@@ -119,7 +118,8 @@ const Write = () => {
 			toast.error("Please add a body to your post");
 			return;
 		}
-	
+		console.log(content);
+
 		try {
 			setIsLoading(true);
 			if (postId) {
@@ -225,7 +225,7 @@ const Write = () => {
 
 					<InputTags tags={tags} suggestions={suggestions} setSuggestions={setSuggestions} setShowTagsTooltip={setShowTagsTooltip} setTags={setTags} />
 				</div>
-				<ReactQuill onFocus={() => setShowContentTooltip(true)} onBlur={() => setShowContentTooltip(false)} className="h-60 rounded-md" theme="snow" value={content} onChange={setContent} />
+				<Editor content={content} handleChange={setContent} />
 				<Button onClick={onSubmit} disabled={isLoading} className="bg-blue-700 disabled:opacity-60 text-white text-[16px] mt-14 flex gap-1 hover:bg-blue-800">
 					<Send size={15} />
 					<span>Publish</span>

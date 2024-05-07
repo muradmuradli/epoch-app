@@ -50,6 +50,29 @@ const SinglePost = ({ params }: { params: { postId: string } }) => {
 			setIsLoading(false);
 		}
 	};
+	
+	const renderHTMLContent = (content: string) => {
+		const parser = new DOMParser();
+		const htmlDoc = parser.parseFromString(content, "text/html");
+
+		const unorderedLists = htmlDoc.querySelectorAll("ol");
+		const lastUnorderedList = unorderedLists[unorderedLists.length - 1];
+
+		if (lastUnorderedList) {
+			const referencesHeading = htmlDoc.createElement("h1");
+			referencesHeading.textContent = "References";
+			referencesHeading.classList.add('text-3xl', 'font-bold', 'mt-6');
+			lastUnorderedList.parentNode?.insertBefore(referencesHeading, lastUnorderedList);
+		}
+
+		if (lastUnorderedList) {
+			lastUnorderedList.classList.add("pt-4", "text-[16px]"); // Adjust padding as needed
+		}
+
+		const modifiedContent = htmlDoc.documentElement.innerHTML.replace(/<ol>/g, '<ol style="list-style-type: decimal">');
+
+		return modifiedContent;
+	};
 
 	const likePost = async () => {
 		if (userId) {
@@ -204,7 +227,7 @@ const SinglePost = ({ params }: { params: { postId: string } }) => {
 							wordWrap: "break-word",
 						}}
 						dangerouslySetInnerHTML={{
-							__html: post?.content!,
+							__html: renderHTMLContent(post?.content!),
 						}}
 					/>
 

@@ -50,23 +50,26 @@ const SinglePost = ({ params }: { params: { postId: string } }) => {
 			setIsLoading(false);
 		}
 	};
-	
+
 	const renderHTMLContent = (content: string) => {
 		const parser = new DOMParser();
 		const htmlDoc = parser.parseFromString(content, "text/html");
 
-		const unorderedLists = htmlDoc.querySelectorAll("ol");
-		const lastUnorderedList = unorderedLists[unorderedLists.length - 1];
+		const orderedLists = htmlDoc.querySelectorAll("ol");
+		const lastOrderedList = orderedLists[orderedLists.length - 1];
 
-		if (lastUnorderedList) {
+		if (lastOrderedList) {
 			const referencesHeading = htmlDoc.createElement("h1");
 			referencesHeading.textContent = "References";
-			referencesHeading.classList.add('text-3xl', 'font-bold', 'mt-6');
-			lastUnorderedList.parentNode?.insertBefore(referencesHeading, lastUnorderedList);
-		}
+			referencesHeading.classList.add("text-3xl", "font-bold", "mt-6");
+			lastOrderedList.parentNode?.insertBefore(referencesHeading, lastOrderedList);
 
-		if (lastUnorderedList) {
-			lastUnorderedList.classList.add("pt-4", "text-[16px]"); // Adjust padding as needed
+			lastOrderedList.classList.add("pt-4", "text-base");
+
+			const listItems = lastOrderedList.querySelectorAll("li");
+			listItems.forEach((item, index) => {
+				item.innerHTML = `${index + 1}. ${item.innerHTML}`;
+			});
 		}
 
 		const modifiedContent = htmlDoc.documentElement.innerHTML.replace(/<ol>/g, '<ol style="list-style-type: decimal">');

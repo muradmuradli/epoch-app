@@ -3,12 +3,13 @@
 import { Input } from "@/components/ui/input";
 import { UserButton, useAuth } from "@clerk/nextjs";
 import axios from "axios";
-import { LogIn, Pencil, PencilIcon, Search } from "lucide-react";
+import { LogIn, PencilIcon, Search } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Button } from "./ui/button";
+import { FaBookmark } from "react-icons/fa";
 import SuggestionMenu from "./suggestion-menu";
-import { Post } from "@prisma/client";
+import { Button } from "./ui/button";
+import SavedPosts from "@/app/(pages)/posts/saved/page";
 
 const Navbar = () => {
 	const { isLoaded, userId, sessionId, getToken } = useAuth();
@@ -59,14 +60,18 @@ const Navbar = () => {
 			</div>
 
 			{/* Sign In Button / User Button */}
-			<div className="flex items-center gap-10">
+			<div className="flex items-center gap-5">
 				<Link className="flex gap-2 text-slate-600 items-center hover:text-slate-900 transition py-0 px-2" href={"/write"}>
 					<PencilIcon size={16} />
-					<span >Write</span>
+					<span>Write</span>
 				</Link>
 
 				{userId ? (
-					<UserButton afterSignOutUrl="/" />
+					<UserButton afterSignOutUrl="/">
+						<UserButton.UserProfilePage label="Saved" url="custom" labelIcon={<FaBookmark className="ml-[1px]" />}>
+							<SavedPosts />
+						</UserButton.UserProfilePage>
+					</UserButton>
 				) : (
 					<div>
 						<Link href={"/sign-up"}>

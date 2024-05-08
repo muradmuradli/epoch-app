@@ -27,9 +27,9 @@ const PostCard = async (post: Post) => {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
-                <h1 className="text-sm">
+                <Link href={`/users/${user.id}`} className="text-sm">
                   {user.firstName} {user.lastName}
-                </h1>
+                </Link>
               </TooltipTrigger>
               <TooltipContent>
                 <div>

@@ -11,17 +11,12 @@ interface SuggestionMenuProps {
 	setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const SuggestionMenu: React.FC<SuggestionMenuProps> = ({
-	posts,
-	isOpen,
-	setIsOpen,
-}) => {
+const SuggestionMenu: React.FC<SuggestionMenuProps> = ({ posts, isOpen, setIsOpen }) => {
 	const [mounted, setMounted] = useState(false);
-	const menuRef = useRef<HTMLDivElement>(null); // Ref for the menu
+	const menuRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		setMounted(true);
-		// Add event listener to detect clicks outside the menu
 		document.addEventListener("click", handleClickOutside);
 		return () => {
 			document.removeEventListener("click", handleClickOutside);
@@ -30,17 +25,16 @@ const SuggestionMenu: React.FC<SuggestionMenuProps> = ({
 
 	const handleClickOutside = (e: MouseEvent) => {
 		if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-			setIsOpen(false); // Close menu if clicked outside
+			setIsOpen(false);
 		}
 	};
 
 	// Ensure the dropdown menu is rendered only on the client-side
 	if (!mounted) return null;
 
-	console.log(posts);
 	return (
 		<AnimatePresence>
-			{isOpen && posts.length > 0 && (
+			{isOpen && posts?.length > 0 && (
 				<motion.div
 					className="absolute top-10 flex flex-col rounded border border-slate-300 p-2 mt-2 bg-white w-[80%]"
 					initial={{ opacity: 0 }}
@@ -53,12 +47,8 @@ const SuggestionMenu: React.FC<SuggestionMenuProps> = ({
 						<Hexagon size={15} />
 					</div>
 					<DropdownMenuSeparator />
-					{posts.map((post) => (
-						<Link
-							key={post.id}
-							className="p-2 hover:bg-slate-50 text-sm"
-							href={`/posts/${post.id}`}
-						>
+					{posts?.map((post) => (
+						<Link key={post.id} className="p-2 hover:bg-slate-50 text-sm" href={`/posts/${post.id}`}>
 							{post.title}
 						</Link>
 					))}

@@ -34,7 +34,7 @@ const Navbar = () => {
 			const { data } = await axios.get("/api/posts", {
 				params: { title: inputText.trim() },
 			});
-			setSearchResults(data.data);
+			setSearchResults(data.posts);
 		} catch (error) {
 			console.error("Error fetching posts:", error);
 			setSearchResults([]);

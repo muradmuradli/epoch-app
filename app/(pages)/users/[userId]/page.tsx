@@ -1,6 +1,5 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { estimateReadingTime, formatDate } from "@/lib/utils";
 import { useUser } from "@clerk/nextjs";
